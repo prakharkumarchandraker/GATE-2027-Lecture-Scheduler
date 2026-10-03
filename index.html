@@ -397,7 +397,7 @@ async function flush() {
   flushing = false; paintSync();
   if (Object.keys(SYNC.pending).length) setTimeout(flush, 1500);
 }
-let firstRemote = true;
+let firstRemote = true, firstConn = true;
 function onRemote(v) {
   if (v == null || !v.core) {               // empty cloud: upload everything we have
     Object.assign(SYNC.pending, fullMap()); saveLocal(); firstRemote = false; flush(); return;
@@ -408,7 +408,7 @@ function onRemote(v) {
   const before = JSON.stringify(S);
   S = T; migrate();
   firstRemote = false;
-  SYNC.status = 'on'; if (!SYNC.msg) SYNC.msg = 'Synced';
+  SYNC.status = 'on'; SYNC.msg = 'Synced ' + clock(curMin());
   saveLocal();
   if (JSON.stringify(S) !== before) render(); else paintSync();
 }
@@ -423,7 +423,7 @@ async function startSync() {
       const rt = await import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-database.js`);
       const app = ap.initializeApp(FIREBASE_CFG);
       const db = rt.getDatabase(app), ref = rt.ref(db, path);
-      rt.onValue(rt.ref(db, '.info/connected'), s => { SYNC.connected = !!s.val(); if (SYNC.connected) flush(); else { SYNC.msg = 'Offline — saving on this device'; paintSync(); } });
+      rt.onValue(rt.ref(db, '.info/connected'), s => { SYNC.connected = !!s.val(); if (SYNC.connected) { SYNC.msg = 'Synced ' + clock(curMin()); paintSync(); flush(); } else if (!firstConn) { SYNC.msg = 'Offline — saving on this device'; paintSync(); } firstConn = false; });
       rt.onValue(ref, s => onRemote(s.val()), err => { SYNC.status = 'err'; SYNC.msg = 'Sync blocked: ' + err.code + ' — check Firebase rules (see README)'; paintSync(); });
       SYNC.backend = { update: m => rt.update(ref, m) };
     }
