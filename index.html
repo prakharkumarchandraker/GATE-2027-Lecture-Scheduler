@@ -224,6 +224,23 @@ nav button[aria-current="true"] .pip{background:var(--pen)}
 .mt div{background:#F3F5EF;border-radius:9px;padding:8px;text-align:center}
 .mt b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:19px}
 .mt span{font-size:12px;color:var(--ink3);font-weight:600}
+.sumhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}.sumhead .sl2{flex:1}
+.sl2{font-size:14px;font-weight:600;color:var(--ink2)}
+.spdbtn{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;background:var(--pen);color:#fff;border:0;border-radius:9px;padding:8px 13px;cursor:pointer}
+.spdbtn span{opacity:.7;padding-left:3px}
+.sumtot{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-top:10px;margin-top:10px;border-top:1px solid var(--line)}
+.gr{font-family:"IBM Plex Mono",monospace;color:var(--moss);font-weight:600}
+.st2{font-family:"IBM Plex Mono",monospace;color:#9AA09B;text-decoration-color:#C3C9C2;font-weight:500;font-size:.9em}
+.layrow{border-top:1px solid var(--line);padding:3px 0}.layrow:first-of-type{border-top:0}
+.layrow>summary{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:baseline;padding:10px 2px;cursor:pointer;list-style:none}
+.laysp{font-family:"IBM Plex Mono",monospace;font-size:14.5px;font-weight:600;color:var(--pen);background:#E4EAF3;border-radius:7px;padding:3px 9px}
+.layrow.cur .laysp{background:var(--pen);color:#fff}
+.layn{font-size:14.5px;font-weight:600;white-space:nowrap}
+.laycum{grid-column:1/-1;font-size:12.5px;color:var(--ink3);font-weight:500}
+.layitem{display:flex;align-items:flex-start;gap:12px;padding:8px 0 8px 11px;border-left:4px solid var(--sc);margin:0 0 6px}
+.li-main{flex:1;min-width:0}.lt2{display:block;font-size:14.5px;font-weight:600;line-height:1.3}
+.ls2{display:block;margin-top:2px;font-size:12.5px;color:var(--sc);font-weight:600}
+.durline{white-space:nowrap}
 </style></head><body>
 <div class="wrap" id="app"></div>
 <div id="sheet"></div>
@@ -732,7 +749,7 @@ function planDay(d, ideal) {
   const overflow = items.slice(qi);
   study.forEach(s => B.push(s));
   B.sort((a, b) => a.start - b.start || (a.kind === 'study' ? 1 : -1));
-  return { ideal: !!ideal, d, s0, B, pins: pins.sort((a, b) => a.at - b.at), breaks, notes, gymMode, studyMins, foodOK, rev, items, overflow, off };
+  return { vb: vidBudget - prac, emDone, ideal: !!ideal, d, s0, B, pins: pins.sort((a, b) => a.at - b.at), breaks, notes, gymMode, studyMins, foodOK, rev, items, overflow, off };
 }
 function curMinFor(d) { return d === dk() ? curMin() : 0; }
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
@@ -941,6 +958,39 @@ function nowCard(P, now) {
   if (next.length) h += `<div class="nextl"><b>Next</b>${next.map(r => `<div class="irow" style="--c:${r.color}">${tchip(r.t)}<span>${esc(r.name)}</span></div>`).join('')}</div>`;
   return h + '</div>';
 }
+const pairT = (raw, sp) => { const w = Math.round(raw / sp); return w === raw ? `<b class="gr">${hm(raw)}</b>` : `<s class="st2">${hm(raw)}</s> <b class="gr">${hm(w)}</b>`; };
+function CYCLE() { const i = SPEEDS.indexOf(CFG().speed); SETSP(SPEEDS[(i + 1) % SPEEDS.length]); }
+function subjChips(P) {
+  const g = [];
+  P.items.filter(i => i.type === 'lec').forEach(i => { let e = g.find(x => x.s.id === i.x.s.id); if (!e) g.push(e = { s: i.x.s, n: 0, raw: 0 }); e.n++; e.raw += i.part ? i.part.raw : i.x.rem; });
+  const raw = g.reduce((a, b) => a + b.raw, 0);
+  return `<div class="sumhead"><span class="sl2">Lectures today</span><button class="spdbtn" onclick="CYCLE()">${CFG().speed}x <span>↻</span></button></div>
+   <div class="chips">${g.length ? g.map(e => `<span class="chip" style="--c:${e.s.color};color:${e.s.color}"><b>${e.n}</b> ${esc(e.s.name)}</span>`).join('') : '<span class="faint sm">No lectures fit</span>'}</div>
+   <div class="sumtot"><span class="sl2">Lectures</span><span>${pairT(raw, CFG().speed)}</span></div>`;
+}
+function speedLayers(P) {
+  const seen = {}, out = []; let cn = 0, cr = 0, cm = 0;
+  SPEEDS.forEach(sp => {
+    const r = assignDay(makePool(), P.vb, dayIdxOf(P.d), sp, P.emDone);
+    const its = [...r.em, ...r.A, ...r.B, ...r.side].map(x => ({ x, raw: x.rem }));
+    if (r.partial) its.push({ x: r.partial.it, raw: r.partial.raw, part: r.partial });
+    const add = its.filter(i => !seen[i.x.l.id]); its.forEach(i => seen[i.x.l.id] = 1);
+    const ar = add.reduce((a, i) => a + i.raw, 0), am = add.reduce((a, i) => a + Math.round(i.raw / sp), 0);
+    cn += add.length; cr += ar; cm += am;
+    out.push({ sp, add, ar, am, cn, cr, cm });
+  });
+  return out;
+}
+function layersCard(P) {
+  if (!P || P.vb <= 0) return '';
+  const L = speedLayers(P); if (!L[0].cn) return '';
+  return `<div class="card"><h2>How far you can get today</h2>
+   <p class="sm muted" style="margin:2px 0 8px">Do the 1x list first — it covers every subject. Each faster speed only adds more on top, in the same ${hm(P.vb)} of lecture time.</p>
+   ${L.map((o, i) => (i && !o.add.length) ? '' : `<details class="layrow ${CFG().speed === o.sp ? 'cur' : ''}" ${i === 0 ? 'open' : ''}><summary>
+     <span class="laysp">${i ? '+ ' : ''}${o.sp}x</span><span class="layn">${i ? o.add.length + ' more' : o.add.length + ' lectures'}</span><span class="durline">${pairT(o.ar, o.sp)}</span>
+     <div class="laycum">running total ${o.cn} lectures · ${o.cr === o.cm ? `<b class="gr">${hm(o.cr)}</b>` : `<s class="st2">${hm(o.cr)}</s> <b class="gr">${hm(o.cm)}</b>`}</div></summary>
+     ${o.add.map(a => `<div class="layitem" style="--sc:${a.x.s.color}"><div class="li-main"><span class="lt2">${esc(a.x.l.t)}${a.part ? ' <span class="cont">part</span>' : ''}</span><span class="ls2">${esc(a.x.s.name)}</span></div><span class="durline">${pairT(a.raw, o.sp)}</span></div>`).join('')}</details>`).join('')}</div>`;
+}
 function viewToday() {
   const d = dk(), day = getDay(d), now = curMin(), I = planDay(d, true);
   if (day.meta.start == null) {
@@ -949,7 +999,7 @@ function viewToday() {
      <div class="card nowcard"><h2>Right now · ${clock(now)}</h2><p class="sm muted" style="margin:0 0 12px">Tap when you're up. It asks what's already done, then builds the day from right now up to lights out at ${clock(CFG().sleep)}.</p>
      <button class="btn big" onclick="openCheckin()">I'm up — build my day</button>
      <div class="note" style="background:#F7EEF4;border-color:#E6CFE0;color:#6B2F57">Skincare: ${esc(skinNow)}</div></div>
-     ${banner()}</div><div class="main">
+     ${banner()}${layersCard(I)}</div><div class="main">
      <div class="card"><div class="sec"><h2>Your ideal day</h2><span class="mono muted sm">wake ${clock(CFG().idealWake)}</span></div>
      <p class="sm muted" style="margin:0 0 8px">This is the original timetable. Wake later and the app moves things for you.</p>${idealHTML(I)}</div>
      ${yesterdayCard()}</div></div>`;
@@ -976,7 +1026,7 @@ function viewToday() {
     <div class="chips"><span class="chip" style="--c:var(--study)">Study <b>${hm(P.studyMins)}</b></span>
     <span class="chip" style="--c:var(--gym)">${gymTxt}</span>
     <span class="chip" style="--c:var(--rev)">Revision <b>${hm(P.rev.mins)}</b></span>
-    <span class="chip" style="--c:var(--study)">Lectures <b>${nLec}</b> · ${hm(vidPlanned)} at ${CFG().speed}x</span></div>
+    </div><div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">${subjChips(P)}</div>
     ${P.studyMins + doneMins < CFG().studyMin && !P.off ? `<div class="note">Short day: ${hm(P.studyMins)} of study fits before lights out (your minimum is ${hm(CFG().studyMin)}). Still beats zero — keep the chain.</div>` : ''}
     ${P.notes.map(n => `<div class="note">${esc(n)}</div>`).join('')}
     ${P.overflow.length ? `<div class="sm faint" style="margin-top:8px">${P.overflow.filter(i => i.type === 'lec').length} planned lecture(s) didn't fit — they move to tomorrow on their own.</div>` : ''}
@@ -988,7 +1038,7 @@ function viewToday() {
   const ctrl = `<div class="dayhead"><button class="btn" onclick="openCheckin()">Running late? Re-plan from now</button>
     <button class="btn ${P.off ? '' : 'off'}" onclick="OFFDAY()">${P.off ? 'Off day ON' : 'Make today off'}</button></div>`;
   const doneBox = doneToday.length ? `<details class="card donebox"><summary>Done before this plan — ${doneToday.length} lecture(s) ✓</summary>${doneToday.map(x => lecRow(x, 0, false)).join('')}</details>` : '';
-  return `<div class="grid"><div class="side">${nowCard(P, now)}${summary}${moved}${banner()}</div><div class="main">${ctrl}<h2 style="margin:4px 0 10px">Full day</h2><div class="tl">${tl}</div>${doneBox}</div></div>`;
+  return `<div class="grid"><div class="side">${nowCard(P, now)}${summary}${layersCard(P)}${moved}${banner()}</div><div class="main">${ctrl}<h2 style="margin:4px 0 10px">Full day</h2><div class="tl">${tl}</div>${doneBox}</div></div>`;
 }
 function yesterdayCard() {
   const y = addD(dk(), -1), yd = S.days[y]; if (!yd || !yd.meta || yd.meta.start == null) return '';
