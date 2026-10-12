@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Day OS">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@450;500;600&family=IBM+Plex+Sans:wght@450;500;600;700&display=swap" rel="stylesheet">
-<style>:root{--paper:#EFF1EC;--line:#DDE1D7;--ink:#14191A;--ink2:#454D4A;--ink3:#697169;
+<style>:root{--paper:#EFF1EC;--line:#DDE1D7;--ink:#14191A;--ink2:#2F3633;--ink3:#4E5651;
 --pen:#27436F;--plum:#5D4064;--moss:#2F6B48;--clay:#A34328;--card:#FCFCFA;--edge:#D6DACE;
 --meal:#B7701B;--gym:#2F6B48;--home:#1F7A73;--skin:#9A3F7A;--med:#B4322B;--study:#27436F;--rev:#5D4064;--free:#8A918B}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -18,7 +18,7 @@ html,body{margin:0}
 body{background:var(--paper);
 background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
 background-size:28px 28px;color:var(--ink);
-font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:1.5;font-weight:450;
+font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:1.5;font-weight:500;
 padding-bottom:96px;-webkit-text-size-adjust:100%}
 .wrap{max-width:660px;margin:0 auto;padding:14px 13px 0}
 h1{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;font-weight:700;letter-spacing:-.02em;font-size:26px;margin:0 0 12px}
@@ -69,7 +69,7 @@ button{font-family:inherit;font-size:15px}
 .btn.off{background:#fff;color:var(--clay);border-color:#E5CDC3}
 .mini{padding:5px 9px;font-size:13px;border-radius:7px}
 .row2b{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-input,select,textarea{font-family:inherit;font-size:15px;border:1px solid var(--edge);border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);width:100%;font-weight:450}
+input,select,textarea{font-family:inherit;font-size:15px;border:1px solid var(--edge);border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);width:100%;font-weight:500}
 textarea{min-height:110px;font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.6}
 label.f{display:block;margin:12px 0 5px;font-size:14px;color:var(--ink2);font-weight:500}
 :focus-visible{outline:2px solid var(--pen);outline-offset:2px}
@@ -241,13 +241,22 @@ nav button[aria-current="true"] .pip{background:var(--pen)}
 .li-main{flex:1;min-width:0}.lt2{display:block;font-size:14.5px;font-weight:600;line-height:1.3}
 .ls2{display:block;margin-top:2px;font-size:12.5px;color:var(--sc);font-weight:600}
 .durline{white-space:nowrap}
-.bigclock .secs{font-size:.55em;color:var(--ink3);letter-spacing:0}
 .fsbtn{display:flex;align-items:center;gap:6px;border:1px solid var(--edge);background:var(--card);border-radius:10px;padding:9px 12px;font-size:13.5px;font-weight:600;color:var(--ink2);cursor:pointer;flex:0 0 auto}
 @media(max-width:520px){.fsbtn span{display:none}.fsbtn{padding:9px}}
-.chill{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;background:linear-gradient(120deg,#1E5B45,#1F3B66);color:#fff;border-radius:12px;padding:11px 15px;margin-bottom:12px}
-.chill-h{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:19px;letter-spacing:-.01em;white-space:nowrap}
-.chill-l{font-size:14.5px;line-height:1.45;color:#E3EAF3;font-weight:500;flex:1;min-width:240px}
-.chill-l b{color:#fff}
+
+/* readability pass */
+.chill{background:linear-gradient(120deg,#1E5B45,#1F3B66);color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:14px}
+.chill-h{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:22px;margin-bottom:8px}
+.chill-h small{font-family:"IBM Plex Sans",sans-serif;font-size:15px;font-weight:600;color:#D5E0EE;margin-left:6px}
+.chill ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.chill li{background:rgba(255,255,255,.10);border-radius:10px;padding:9px 12px;font-size:16px;font-weight:600;line-height:1.35}
+.chill li.ok{background:rgba(96,214,150,.20);outline:2px solid rgba(140,230,180,.55)}
+.chill li .sp{font-family:"IBM Plex Mono",monospace;font-size:18px;font-weight:700;margin-right:8px}
+.chill li .dt{font-size:17px;font-weight:700}
+.chill li .ms{display:block;font-size:14.5px;font-weight:600;color:#E6EEF7;margin-top:2px}
+.chill .ft{font-size:14.5px;font-weight:600;color:#D5E0EE;margin-top:9px}
+@media(min-width:760px){.chill ul{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:759px){.chill ul{grid-template-columns:1fr}.chill li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}.chill li .ms{display:inline;margin:0}}
 </style></head><body>
 <div class="wrap" id="app"></div>
 <div id="sheet"></div>
@@ -275,7 +284,7 @@ const DEF_CFG = {
   nightMeds: 1250, bedSnack: 1290, pmSkin: 1350, pmMins: 15,
   studyMin: 360, studyMax: 660, offStudy: 120, revCap: 60, chunk: 90, gap: 10,
   target: '2026-12-31', gate: '2027-02-01', bits: '2027-05-01',
-  emDaily: true, water: 12, dayStart: 240, idealWake: 540
+  emDaily: true, water: 12, dayStart: 240, idealWake: 540, textScale: 0
 };
 function freshCore() {
   return JSON.parse(JSON.stringify({
@@ -877,7 +886,7 @@ function pinHTML(p, now) {
 }
 
 /* ---------------- views ---------------- */
-const clockS = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()) + '<span class="secs">:' + pad(d.getSeconds()) + '</span>'; };
+const clockS = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); };
 const isFS = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
 function FS() {
   const el = document.documentElement;
@@ -893,13 +902,13 @@ const fsIcon = () => isFS()
   : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span>';
 function chill() {
   const c = CFG(), hh = c.studyMax, g = c.gate;
-  const fit = SPEEDS.find(x => diffD(simulate(x, hh).end, g) >= 0);
-  const one = simulate(1, hh);
-  let main;
-  if (fit) { const e = simulate(fit, hh).end; main = `At <b>${fit}x</b> you finish the whole syllabus by <b>${fmt2(e)}</b> — <b>${diffD(e, g)} days before GATE</b>.`; }
-  else main = `You'll cover <b>${simulate(2, hh).gate.pct}%</b> by GATE at 2x and finish everything well before BITS.`;
-  const sub = fit === 1 ? `Even on easy days you're on track.` : `Even plain 1x covers <b>${one.gate.pct}%</b> by GATE and <b>${one.bits.pct}%</b> before BITS.`;
-  return `<div class="chill"><span class="chill-h">Chill — you have time.</span><span class="chill-l">${main} ${sub}</span></div>`;
+  const rows = SPEEDS.map(sp => {
+    const m = simulate(sp, hh), before = diffD(m.end, g);
+    return `<li class="${before >= 0 ? 'ok' : ''}"><span class="sp">${sp}x</span><span class="dt">done ${fmt2(m.end)}</span>
+      <span class="ms">${before >= 0 ? `✓ ${before} days before GATE` : `${m.gate.pct}% by GATE · ✓ all before BITS`}</span></li>`;
+  }).join('');
+  return `<div class="chill"><div class="chill-h">Chill — you have time.<small>${hm(hh)} a day, starting today:</small></div><ul>${rows}</ul>
+   <div class="ft">Pick any green one in Settings → speed. Today's work is only today's work.</div></div>`;
 }
 function head() {
   const g = diffD(dk(), CFG().gate), b = diffD(dk(), CFG().bits);
@@ -1256,10 +1265,13 @@ function numRow(label, key, unit) { return `<div class="setrow"><span class="sl"
 const CFT = (k, v) => { S.core.cfg[k] = toMin(v); setCore(); };
 const CFN = (k, v) => { S.core.cfg[k] = Math.max(0, +v || 0); setCore(); };
 const CFV = (k, v) => { S.core.cfg[k] = v; setCore(); };
+function applyScale() { const t = CFG().textScale || (innerWidth >= 900 ? 1.2 : 1.08); if (document.body.style.zoom !== String(t)) document.body.style.zoom = t; }
+const SCALES = [1, 1.1, 1.2, 1.3, 1.4];
 function viewSet() {
   const c = CFG(), sk = S.core.skin;
   const lines = arr => (arr || []).map(s => s.d ? s.n + ' | ' + s.d : s.n).join('\n');
-  return `<div class="card"><h2>Sync</h2>
+  return `<div class="card"><h2>Text size</h2><div class="spd">${SCALES.map(x => `<button class="${(CFG().textScale || 0) === x ? 'on' : ''}" onclick="CFV('textScale',${x})">${Math.round(x * 100)}%</button>`).join('')}<button class="${!CFG().textScale ? 'on' : ''}" onclick="CFV('textScale',0)">Auto</button></div></div>
+  <div class="card"><h2>Sync</h2>
    ${SYNC.code ? `<p class="sm muted" style="margin:0">Your sync code — type it on your other device once. Keep it somewhere safe.</p>
    <div class="codebox">${esc(SYNC.code)}</div><p class="sm" id="syncstat" style="margin:0 0 8px">${esc(SYNC.msg)}</p>
    <div class="row2b"><button class="btn quiet" onclick="COPYCODE()">Copy code</button><button class="btn quiet" onclick="SHEET='join';render()">Use a different code</button></div>`
@@ -1471,6 +1483,7 @@ function render() {
   try { body = head() + V(); }
   catch (err) { console.error(err); body = `<h1>Something broke</h1><div class="card warn"><p class="sm">${esc(err && err.message || err)}</p><button class="btn wide" onclick="go('today')">Go to Today</button></div>`; }
   const y = window.scrollY;
+  applyScale();
   document.getElementById('app').innerHTML = body;
   document.getElementById('sheet').innerHTML = sheetHTML() + joinHTML();
   paintTimer();
@@ -1497,5 +1510,6 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) { re
   migrate(); saveLocal(); render(); startSync();
   if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
+window.addEventListener('resize', () => { if (S) applyScale(); });
 
 </script></body></html>
